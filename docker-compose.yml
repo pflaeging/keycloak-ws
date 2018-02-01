@@ -1,0 +1,55 @@
+version: '2'
+
+services:
+  keycloak:
+    image: pflaeging/keycloak-pg:3.4.3-1
+    links:
+      - postgres
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=KeyCloak
+      - POSTGRES_PASSWORD=KeyCloak
+      - POSTGRES_USER=keycloak
+      - PROXY_ADDRESS_FORWARDING=true
+      # Workaround for container using legacy Docker links, resulting in
+      # "WFLYCTL0211: Cannot resolve expression 'jdbc:postgresql://${env.POSTGRES_PORT_5432_TCP_ADDR}...")n
+      - POSTGRES_PORT_5432_TCP_ADDR=postgres
+    depends_on:
+      - postgres
+    restart: always
+
+  postgres:
+    image: postgres:9.6
+    ports:
+      - 15432:5432
+    environment:
+      POSTGRES_PASSWORD: KeyCloak
+      POSTGRES_USER: keycloak
+    volumes:
+      - ./pg-data:/var/lib/postgresql/data
+    restart: always
+
+  ldap:
+    image: pflaeging/openldap:0.90
+    ports:
+      - 10389:389
+      - 10636:636
+    volumes:
+      - ./ldap-data:/var/lib/ldap
+      - ./sldapd-config:/etc/ldap/slapd.d
+    environment:
+      - LDAP_ORGANISATION="KeyCloak Workshop pflaeging.net"
+      - LDAP_DOMAIN=workshop.local
+      - LDAP_ADMIN_PASSWORD=AdMin
+    restart: always
+
+  haproxy:
+    image: haproxy:alpine
+    ports:
+      - 20443:443/tcp
+#      - 1936:1936/tcp
+    volumes:
+      - ./haproxy-etc:/usr/local/etc/haproxy
+    depends_on:
+      - keycloak
+    restart: always
