@@ -34,3 +34,16 @@ These is a docker-compose configuration for a quickstart keycloak:
 ## next
 
 Now you can open your Keycloak console with https://servername:20443/
+
+## Examples
+
+In the folder examples are the two example container from the workshop:
+
+- Redmine
+- Rocket.Chat
+
+Configuration is discussed in the workshop!
+
+Greetings
+
+:peter pfläging <peter@pflaeging.net>

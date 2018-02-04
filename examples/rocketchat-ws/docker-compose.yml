@@ -1,0 +1,32 @@
+version: '2'
+services:
+  mongo:
+    image: mongo
+    command:
+    - mongod
+    - --smallfiles
+    - --oplogSize
+    - '128'
+    volumes:
+     - ./mongo-db:/data/db
+
+  rocketchat:
+    image: rocketchat/rocket.chat:0.60.4
+    environment:
+      MONGO_URL: mongodb://mongo:27017/rocketchat
+      PORT: '3000'
+      ROOT_URL: http://yourhost:3000
+    links:
+    - mongo:mongo
+    ports:
+    - 3000:3000/tcp
+
+  haproxy:
+    image: haproxy:alpine
+    ports:
+      - 21443:443/tcp
+    volumes:
+      - ./haproxy-etc:/usr/local/etc/haproxy
+    depends_on:
+      - rocketchat
+    restart: always

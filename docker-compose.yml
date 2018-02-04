@@ -19,7 +19,7 @@ services:
     restart: always
 
   postgres:
-    image: postgres:9.6
+    image: postgres:9.6-alpine
     ports:
       - 15432:5432
     environment:

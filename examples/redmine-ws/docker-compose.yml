@@ -1,0 +1,33 @@
+version: '2'
+services:
+  postgres:
+    image: postgres:9.6-alpine
+    environment:
+      POSTGRES_PASSWORD: redmine
+      POSTGRES_USER: redmine
+    volumes:
+    - ./pg-data:/var/lib/postgresql/data
+    restart: always
+
+  redmine:
+    image: pflaeging/redmine-saml:3.4.4-1
+    environment:
+      PASSENGER_DOWNLOAD_NATIVE_SUPPORT_BINARY: '0'
+      REDMINE_DB_PASSWORD: redmine
+      REDMINE_DB_POSTGRES: postgres
+      REDMINE_DB_USERNAME: redmine
+    volumes:
+    - ./rm-files:/usr/src/redmine/files
+    depends_on:
+    - postgres
+    restart: always
+
+  haproxy:
+    image: haproxy:alpine
+    ports:
+      - 22443:443/tcp
+    volumes:
+      - ./haproxy-etc:/usr/local/etc/haproxy
+    depends_on:
+      - redmine
+    restart: always
