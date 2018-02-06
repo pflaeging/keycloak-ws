@@ -12,7 +12,7 @@ These is a docker-compose configuration for a quickstart keycloak:
 
 1. git clone the repo
 2. cd certs
-3. ./gencerts my.magic.testdomain
+3. ./gencert my.magic.testdomain
 4. cp cert.pem ../haproxy-etc/cert.pem
 5. cd ..
 6. docker-compose up -d
